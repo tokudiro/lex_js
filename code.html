@@ -1,0 +1,88 @@
+<html>
+<head>
+    <script>
+    function inputChange() {
+        text = document.getElementById('text');
+        //console.log(text.value);
+        parse(text.value);
+    }
+    
+    function suji( key ) {
+         addResult( "suji", key );
+    }
+    
+    function hensu( key ) {
+         addResult( "hensu", key );
+    }
+
+    function kaigyo( key ) {
+         addResult( "kaigyo", key );
+    }
+    
+    function double_quotation( key ) {
+         addResult( "kigo", key );
+    }
+    
+    var result;
+    function addResult( type, key) {
+        // result
+        element = document.createElement("pre");
+        element.innerHTML = type + ":" + key;
+        result.appendChild(element);
+    }
+    
+    var parse_list = new Array();
+    parse_list.push( { reg : '[a-z|A-Z][a-z|A-Z|0-9]*', func : hensu } );
+    parse_list.push( { reg : '-*[0-9|.]+[F|f]*', func : suji } );
+    parse_list.push( { reg : '\"', func : double_quotation } );
+    parse_list.push( { reg : '\n', func : kaigyo } );
+    
+    function parse(text) {
+        process = document.getElementById('process');
+        process.textContent = "parsing.";
+        
+        result = document.getElementById('result');
+        while (result.firstChild) {
+            result.removeChild(result.firstChild);
+        }
+        
+        while(text.length>0) {
+            isKey = false;
+            for( parse_key of parse_list ) {
+                const reg = new RegExp(parse_key.reg);
+                index = text.search(reg);
+                if (index == 0) {
+                    //console.log(index);
+                    key = reg.exec(text);
+                    // console.log(key);
+                    text = key.input.replace(reg, "");
+                    
+                    parse_key.func( key[0] );
+                    
+                    isKey = true;
+                    break;
+                }
+            }
+            if (isKey == false) {
+                len = text.length;
+                ch = text.charAt(0);
+                text = text.substr(1, len-1);
+                
+                // result
+                element = document.createElement("pre");
+                element.innerHTML = ch;
+                result.appendChild(element);
+            }
+         }
+        process.textContent = "end parse.";
+    }
+    </script>
+</head>
+
+<body>
+    <div id="process"></div>
+    <textarea rows="10" cols="60" id="text" onchange="inputChange()"></textarea>
+    
+    <div id="result"></div>
+</body>
+</html>
